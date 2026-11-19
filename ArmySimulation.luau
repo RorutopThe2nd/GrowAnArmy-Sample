@@ -1,5 +1,7 @@
+-- Connected Discord-GitHub
 --!strict
--- by @rorutop on Discord and RorutopThe2nd on Github
+--!native
+--!optimize 2
 local RunService = game:GetService("RunService")
 local enginetypes = require("@engine/enginetypes")
 local packetSchema = require("@engine/render/packetSchema")
@@ -170,7 +172,9 @@ function ArmySimulation.remove(self: simtypes.ArmySimulation, entity_id: number)
 	wu16(entitiesdense, (denseid - 1) * U16, lastId)
 	wu16(entitiesdense, countOff * U16, 0)
 
-	if lastId ~= entity_id then wu16(entitiesmap, (lastId - 1) * U16, denseid) end
+	if lastId ~= entity_id then
+		wu16(entitiesmap, (lastId - 1) * U16, denseid)
+	end
 	wu16(entitiesmap, idoff * U16, 0)
 
 	if not isClient then
@@ -191,18 +195,42 @@ function ArmySimulation.setValue(self: simtypes.ArmySimulation, entity_id: numbe
 
 	local off = entity_id - 1
 
-	if values.posX then wf32(comps.posX, off * F32, values.posX) end
-	if values.posZ then wf32(comps.posZ, off * F32, values.posZ) end
-	if values.velX then wf32(comps.velX, off * F32, values.velX) end
-	if values.velZ then wf32(comps.velZ, off * F32, values.velZ) end
-	if values.yaw then wf32(comps.yaw, off * F32, values.yaw) end
-	if values.health then wf32(comps.health, off * F32, values.health) end
-	if values.state ~= nil then wu8(comps.state, off, values.state) end
-	if values.team ~= nil then wu8(comps.team, off, values.team) end
-	if values.targetId then wu16(comps.targetId, off * U16, values.targetId) end
-	if values.actionState ~= nil then wu8(comps.actionState, off, values.actionState) end
-	if values.combatPhase ~= nil then wu8(comps.combatPhase, off, values.combatPhase) end
-	if values.combatTimer then wf32(comps.combatTimer, off * F32, values.combatTimer) end
+	if values.posX then
+		wf32(comps.posX, off * F32, values.posX)
+	end
+	if values.posZ then
+		wf32(comps.posZ, off * F32, values.posZ)
+	end
+	if values.velX then
+		wf32(comps.velX, off * F32, values.velX)
+	end
+	if values.velZ then
+		wf32(comps.velZ, off * F32, values.velZ)
+	end
+	if values.yaw then
+		wf32(comps.yaw, off * F32, values.yaw)
+	end
+	if values.health then
+		wf32(comps.health, off * F32, values.health)
+	end
+	if values.state ~= nil then
+		wu8(comps.state, off, values.state)
+	end
+	if values.team ~= nil then
+		wu8(comps.team, off, values.team)
+	end
+	if values.targetId then
+		wu16(comps.targetId, off * U16, values.targetId)
+	end
+	if values.actionState ~= nil then
+		wu8(comps.actionState, off, values.actionState)
+	end
+	if values.combatPhase ~= nil then
+		wu8(comps.combatPhase, off, values.combatPhase)
+	end
+	if values.combatTimer then
+		wf32(comps.combatTimer, off * F32, values.combatTimer)
+	end
 end
 
 function ArmySimulation.handleState(self: simtypes.ArmySimulation): ()
@@ -231,7 +259,9 @@ function ArmySimulation.handleState(self: simtypes.ArmySimulation): ()
 
 	for i = 1, count do
 		local id = ru16(dense, (i - 1) * U16)
-		if id == 0 then continue end
+		if id == 0 then
+			continue
+		end
 
 		local off = id - 1
 
@@ -283,11 +313,17 @@ function ArmySimulation.handleState(self: simtypes.ArmySimulation): ()
 
 		-- state enter/exit
 
-		if curState ~= lastState then wu8(lastStateB, off, curState) end
+		if curState ~= lastState then
+			wu8(lastStateB, off, curState)
+		end
 		if actState ~= lastActState then
 			--ENTER
-			if actState == ACTIONSTATE.ATTACKING then armyutils.enterCombat(comps, id) end
-			if actState == ACTIONSTATE.NONE then armyutils.exitCombat(comps, id) end
+			if actState == ACTIONSTATE.ATTACKING then
+				armyutils.enterCombat(comps, id)
+			end
+			if actState == ACTIONSTATE.NONE then
+				armyutils.exitCombat(comps, id)
+			end
 			--EXIT
 			-- if lastActState == ACTIONSTATE.ATTACKING then armyutils.exitCombat(comps, id) end
 			wu8(lastActStateB, off, actState)
@@ -309,11 +345,15 @@ function ArmySimulation.handleStats(self: simtypes.ArmySimulation): ()
 
 	for i = count, 1, -1 do
 		local id = ru16(dense, (i - 1) * U16)
-		if id == 0 then continue end
+		if id == 0 then
+			continue
+		end
 
 		local off = id - 1
 
-		if rf32(health, off * F32) <= 0 then self:remove(id) end
+		if rf32(health, off * F32) <= 0 then
+			self:remove(id)
+		end
 	end
 
 	debug.profileend()
@@ -471,7 +511,9 @@ function ArmySimulation.getSnapshot(self: simtypes.ArmySimulation, tick: number)
 	local validCount = 0
 	for i = 1, count do
 		const id = ru16(entitiesdense, (i - 1) * U16)
-		if id == 0 then continue end
+		if id == 0 then
+			continue
+		end
 
 		const eOff = id - 1
 		const j = validCount
